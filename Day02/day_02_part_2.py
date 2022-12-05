@@ -9,13 +9,43 @@ class Result(Enum):
     DRAW = 3
     WIN = 6
 
+def letter_to_result(letter):
+    if letter == "X":
+        return Result.LOSE
+    if letter == "Y":
+        return Result.DRAW
+    if letter == "Z":
+        return Result.WIN
+
 def letter_to_hand(letter):
-    if letter == "A" or letter == "X":
+    if letter == "A":
         return Hand.ROCK
-    if letter == "B" or letter == "Y":
+    if letter == "B":
         return Hand.PAPER
-    if letter == "C" or letter == "Z":
+    if letter == "C":
         return Hand.SCISSORS
+
+def get_desired_hand(result, opponent):
+    if result == Result.DRAW:
+        return opponent
+
+    match result:
+        case Result.LOSE:
+            match opponent:
+                case Hand.ROCK:
+                    return Hand.SCISSORS
+                case Hand.PAPER:
+                    return Hand.ROCK
+                case Hand.SCISSORS:
+                    return Hand.PAPER
+        case Result.WIN:
+            match opponent:
+                case Hand.ROCK:
+                    return Hand.PAPER
+                case Hand.PAPER:
+                    return Hand.SCISSORS
+                case Hand.SCISSORS:
+                    return Hand.ROCK
 
 def check_hands(playerA, playerB):
     if playerA == playerB:
@@ -42,13 +72,12 @@ def play_round(round):
     round = round.split(" ")
 
     opponent = letter_to_hand(round[0])
-    player = letter_to_hand(round[1])
+    result = letter_to_result(round[1])
+    player_hand = get_desired_hand(result, opponent)
 
-    
-    hand_points = player.value
-    round_points = check_hands(player, opponent).value
+    round_points = check_hands(player_hand, opponent)
 
-    return hand_points + round_points
+    return round_points.value + player_hand.value
 
 # Play RPS
 total_score = 0
